@@ -203,6 +203,8 @@ NS_ASSUME_NONNULL_BEGIN
         
         if (relationship.toMany && isArray) {
             NSArray *managedObjects = [serializer serializeJSONArray:rawValue
+                                                           forObject:self
+                                                      inRelationship:relationship
                                                            inContext:self.managedObjectContext
                                                                error:&error];
             
@@ -212,7 +214,9 @@ NS_ASSUME_NONNULL_BEGIN
         }
         else if (!relationship.toMany && !isArray) {
             NSManagedObject *managedObject = [serializer serializeJSONArray:@[rawValue]
-                                                                  inContext:self.managedObjectContext
+                                                                  forObject:self
+                                                             inRelationship:relationship
+                                                                inContext:self.managedObjectContext
                                                                       error:&error].firstObject;
             
             if (managedObject != nil) {

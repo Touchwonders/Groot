@@ -26,8 +26,41 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface GRTManagedObjectSerializer : NSObject
 
+/**
+ *  Designated initializer for a GRTManagedObjectSerializer.
+ *
+ *  @param entity The entity description to use during serialization process.
+ *
+ *  @return An instance of GRTManagedObjectSerializer.
+ */
 - (instancetype)initWithEntity:(NSEntityDescription *)entity;
 
+/**
+ *  Serialize a JSON Array to a collection of NSManagedObjects by providing a source object and the relationship between the source object and the JSON array to serialize.
+ *
+ *  @param array        The array containing the JSON representation to serialize.
+ *  @param sourceObject If assigned, the source object from where the serialization is triggered.
+ *  @param relationship If assigned, it is the relationship between the provided source object and JSON array to serialize.
+ *  @param context      The context to use to run the serialization process.
+ *  @param outError     The error that might occure while processing the serialization process.
+ *
+ *  @return A collection of NSManagedObject instantiation that conforms to the JSON array serialization.
+ */
+- (nullable NSArray *)serializeJSONArray:(NSArray *)array
+                               forObject:(nullable NSManagedObject *)sourceObject
+                          inRelationship:(nullable NSRelationshipDescription *)relationship
+                             inContext:(NSManagedObjectContext *)context
+                                   error:(NSError *__autoreleasing  __nullable * __nullable)outError;
+
+/**
+ *  Serialize a JSON Array to a collection of NSManagedObjects
+ *
+ *  @param array        The array containing the JSON representation to serialize.
+ *  @param context      The context to use to run the serialization process.
+ *  @param outError     The error that might occure while processing the serialization process.
+ *
+ *  @return A collection of NSManagedObject instantiation that conforms to the JSON array serialization.
+ */
 - (nullable NSArray *)serializeJSONArray:(NSArray *)array
                                inContext:(NSManagedObjectContext *)context
                                    error:(NSError * __nullable * __nullable)error;

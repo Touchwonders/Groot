@@ -46,7 +46,9 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (nullable NSArray *)serializeJSONArray:(NSArray *)array
-                               inContext:(NSManagedObjectContext *)context
+                               forObject:(nullable NSManagedObject *)sourceObject
+                          inRelationship:(nullable NSRelationshipDescription *)relationship
+                             inContext:(NSManagedObjectContext *)context
                                    error:(NSError *__autoreleasing  __nullable * __nullable)outError
 {
     if (array.count == 0) {
@@ -65,9 +67,24 @@ NS_ASSUME_NONNULL_BEGIN
     // Delegate serialization to our strategy object
     
     NSError *error = nil;
-    NSArray *managedObjects = [self.strategy serializeJSONArray:transformedArray
-                                                      inContext:context
-                                                          error:&error];
+    
+    NSArray *managedObjects;
+    
+    // If available, we prefer to choose a serialization based on a relationship to ensure the uniqueness of retrieved objects.
+    
+    if ([[self strategy] respondsToSelector:@selector(serializeJSONArray:forObject:inRelationship:inContext:error:)]) {
+        managedObjects = [self.strategy serializeJSONArray:transformedArray
+                                                 forObject:sourceObject
+                                            inRelationship:relationship
+                                                 inContext:context
+                                                     error:&error];
+    } else {
+        managedObjects = [self.strategy serializeJSONArray:transformedArray
+                                                          inContext:context
+                                                              error:&error];
+    }
+    
+    
     
     // Rollback any changes if an error ocurred
     
@@ -89,6 +106,13 @@ NS_ASSUME_NONNULL_BEGIN
     }
     
     return managedObjects;
+}
+
+- (nullable NSArray *)serializeJSONArray:(NSArray *)array
+                               inContext:(NSManagedObjectContext *)context
+                                   error:(NSError *__autoreleasing  __nullable * __nullable)outError
+{
+    return [self serializeJSONArray:array forObject:nil inRelationship:nil inContext:context error:outError];
 }
 
 @end

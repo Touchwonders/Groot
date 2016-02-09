@@ -32,6 +32,14 @@ NS_ASSUME_NONNULL_BEGIN
                       inContext:(NSManagedObjectContext *)context
                           error:(NSError * __nullable * __nullable)error;
 
+@optional
+
+- (NSArray *)serializeJSONArray:(NSArray *)array
+                      forObject:(nullable NSManagedObject *)sourceObject
+                 inRelationship:(nullable NSRelationshipDescription *)relationship
+                      inContext:(NSManagedObjectContext *)context
+                          error:(NSError *__autoreleasing  __nullable * __nullable)outError;
+
 @end
 
 extern id<GRTSerializationStrategy> GRTSerializationStrategyForEntity(NSEntityDescription *entity);

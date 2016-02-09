@@ -49,6 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (NSArray *)serializeJSONArray:(NSArray *)array
+                      forObject:(nullable NSManagedObject *)sourceObject
+                 inRelationship:(nullable NSRelationshipDescription *)relationship
                       inContext:(NSManagedObjectContext *)context
                           error:(NSError *__autoreleasing  __nullable * __nullable)outError
 {
@@ -73,6 +75,8 @@ NS_ASSUME_NONNULL_BEGIN
             }
             
             NSManagedObject *managedObject = [self serializeJSONDictionary:obj
+                                                                 forObject:sourceObject
+                                                            inRelationship:relationship
                                                                  inContext:context
                                                                      error:&error];
             
@@ -93,14 +97,23 @@ NS_ASSUME_NONNULL_BEGIN
     return managedObjects;
 }
 
+- (NSArray *)serializeJSONArray:(NSArray *)array
+                      inContext:(NSManagedObjectContext *)context
+                          error:(NSError *__autoreleasing  __nullable * __nullable)outError
+{
+    return [self serializeJSONArray:array forObject:nil inRelationship:nil inContext:context error:outError];
+}
+
 #pragma mark - Private
 
 - (NSManagedObject *)serializeJSONDictionary:(NSDictionary *)dictionary
+                                   forObject:(nullable NSManagedObject *)sourceObject
+                              inRelationship:(nullable NSRelationshipDescription *)relationship
                                    inContext:(NSManagedObjectContext *)context
                                        error:(NSError *__autoreleasing  __nullable * __nullable)outError
 {
     NSError *error = nil;
-    NSManagedObject *managedObject = [self existingObjectWithJSONDictionary:dictionary inContext:context error:&error];
+    NSManagedObject *managedObject = [self existingObjectWithJSONDictionary:dictionary forObject:sourceObject inRelationship:relationship inContext:context error:&error];
     
     if (error != nil) {
         if (outError != nil) {
@@ -131,12 +144,26 @@ NS_ASSUME_NONNULL_BEGIN
 }
 
 - (nullable NSManagedObject *)existingObjectWithJSONDictionary:(NSDictionary *)dictionary
+                                                     forObject:(NSManagedObject *)sourceObject
+                                                inRelationship:(NSRelationshipDescription *)relationship
                                                      inContext:(NSManagedObjectContext *)context
                                                          error:(NSError *__autoreleasing  __nullable * __nullable)outError
 {
+    NSPredicate *predicateForJSONDictionary = [self predicateForJSONDictionary:dictionary];
+    NSPredicate *predicateForSourceObject;
+    
+    if (sourceObject && relationship) {
+        predicateForSourceObject = [self predicateForSourceObject:sourceObject inRelationship:relationship];
+    }
+ 
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     fetchRequest.entity = self.entity;
-    fetchRequest.predicate = [self predicateForJSONDictionary:dictionary];
+    
+    if (predicateForSourceObject) {
+        fetchRequest.predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[predicateForJSONDictionary, predicateForSourceObject]];
+    } else {
+        fetchRequest.predicate = predicateForJSONDictionary;
+    }
     
     return [context executeFetchRequest:fetchRequest error:outError].firstObject;
 }
@@ -158,6 +185,27 @@ NS_ASSUME_NONNULL_BEGIN
         [subpredicates addObject:subpredicate];
     }
     
+    return [NSCompoundPredicate andPredicateWithSubpredicates:subpredicates];
+}
+
+- (NSPredicate *)predicateForSourceObject:(NSManagedObject *)sourceObject inRelationship:(NSRelationshipDescription *)relationship
+{
+    NSMutableArray *subpredicates = [NSMutableArray arrayWithCapacity:[[[sourceObject entity] grt_identityAttributes] count]];
+    
+    for (NSAttributeDescription *attribute in [[sourceObject entity] grt_identityAttributes]) {
+        id value = [sourceObject valueForKey:[attribute name]];
+        
+        NSExpression *leftExpression = [NSExpression expressionForKeyPath:[NSString stringWithFormat:@"%@.%@",[[relationship inverseRelationship] name], attribute.name]];
+        NSExpression *rightExpression = [NSExpression expressionForConstantValue:value];
+        
+        NSComparisonPredicate *subpredicate = [NSComparisonPredicate predicateWithLeftExpression:leftExpression
+                                                                                 rightExpression:rightExpression
+                                                                                        modifier:NSDirectPredicateModifier
+                                                                                            type:NSEqualToPredicateOperatorType
+                                                                                         options:0];
+        [subpredicates addObject:subpredicate];
+    }
+
     return [NSCompoundPredicate andPredicateWithSubpredicates:subpredicates];
 }
 
