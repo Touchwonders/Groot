@@ -22,17 +22,17 @@
 
 import Foundation
 
-extension NSValueTransformer {
+extension ValueTransformer {
     /**
      Registers a value transformer with a given name and transform function.
     
      - parameter name: The name of the transformer.
      - parameter transform: The function that performs the transformation.
     */
-    public class func setValueTransformerWithName<T, U>(name: String, transform: (T) -> (U?)) {
-        grt_setValueTransformerWithName(name) { value in
+    public class func setValueTransformerWithName<T, U>(_ name: String, transform: @escaping (T) -> (U?)) {
+        grt_setValueTransformer(withName: name) { value in
             (value as? T).flatMap {
-                transform($0) as? AnyObject
+                transform($0)
             }
         }
     }
@@ -44,14 +44,14 @@ extension NSValueTransformer {
      - parameter transform: The function that performs the forward transformation.
      - parameter reverseTransform: The function that performs the reverse transformation.
     */
-    public class func setValueTransformerWithName<T, U>(name: String, transform: (T) -> (U?), reverseTransform: (U) -> (T?)) {
-        grt_setValueTransformerWithName(name, transformBlock: { value in
+    public class func setValueTransformerWithName<T, U>(_ name: String, transform: @escaping (T) -> (U?), reverseTransform: @escaping (U) -> (T?)) {
+        grt_setValueTransformer(withName: name, transform: { value in
             return (value as? T).flatMap {
-                transform($0) as? AnyObject
+                transform($0)
             }
-            }, reverseTransformBlock: { value in
+            }, reverseTransform: { value in
                 return (value as? U).flatMap {
-                    reverseTransform($0) as? AnyObject
+                    reverseTransform($0)
                 }
         })
     }
@@ -65,9 +65,9 @@ extension NSValueTransformer {
      - parameter name: The name of the transformer.
      - parameter transform: The function that performs the transformation.
     */
-    public class func setDictionaryTransformerWithName(name: String, transform: ([String: AnyObject]) -> ([String: AnyObject]?)) {
-        grt_setDictionaryTransformerWithName(name) { value in
-            if let dictionary = value as? [String: AnyObject] {
+    public class func setDictionaryTransformerWithName(_ name: String, transform: @escaping ([String: AnyObject]) -> ([String: AnyObject]?)) {
+        grt_setDictionaryTransformer(withName: name) { value in
+            if let dictionary = (value as? NSDictionary) as? [String: AnyObject] {
                 return transform(dictionary)
             }
             return nil
@@ -85,9 +85,9 @@ extension NSValueTransformer {
      - parameter name: The name of the mapper.
      - parameter map: The function that performs the mapping.
     */
-    public class func setEntityMapperWithName(name: String, map: ([String: AnyObject]) -> (String?)) {
-        grt_setEntityMapperWithName(name) { value in
-            if let dictionary = value as? [String: AnyObject] {
+    public class func setEntityMapperWithName(_ name: String, map: @escaping ([String: AnyObject]) -> (String?)) {
+        grt_setEntityMapper(withName: name) { value in
+            if let dictionary = (value as? NSDictionary) as? [String: AnyObject] {
                 return map(dictionary)
             }
             return nil

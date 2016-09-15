@@ -120,7 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
                          inManagedObjectContext:(NSManagedObjectContext *)context
                                           error:(NSError * __nullable * __nullable)error __attribute__((deprecated("Replaced by -objectsWithEntityName:fromJSONArray:inContext:error:")));
 
-+ (NSDictionary *)JSONDictionaryFromManagedObject:(NSManagedObject *)managedObject __attribute__((deprecated("Replaced by -JSONDictionaryFromObject:")));
++ (NSDictionary *)JSONDictionaryFromManagedObject:(NSManagedObject *)managedObject  NS_SWIFT_NAME(JSONDictionary(from:)) __attribute__((deprecated("Replaced by -JSONDictionaryFromObject:")));
 
 + (NSArray *)JSONArrayFromManagedObjects:(NSArray *)managedObjects __attribute__((deprecated("Replaced by -JSONArrayFromObjects:")));
 
