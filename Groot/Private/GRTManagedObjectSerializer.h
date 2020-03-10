@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  *  @param array        The array containing the JSON representation to serialize.
  *  @param context      The context to use to run the serialization process.
- *  @param outError     The error that might occure while processing the serialization process.
+ *  @param error     The error that might occure while processing the serialization process.
  *
  *  @return A collection of NSManagedObject instantiation that conforms to the JSON array serialization.
  */

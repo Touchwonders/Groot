@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
  This is the designated initializer.
  
  @param URL The file location of the store. If `nil` the persistent store will be created in memory.
- @param model The managed object model.
+ @param managedObjectModel The managed object model.
  @param error If an error occurs, upon return contains an NSError object that describes the problem.
  */
 - (nullable instancetype)initWithURL:(nullable NSURL *)URL model:(NSManagedObjectModel *)managedObjectModel error:(NSError * __nullable * __nullable)error NS_DESIGNATED_INITIALIZER;
@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
  Initializes a managed store that will persist its data in a discardable cache file.
  
  @param cacheName The name of the cache file.
- @param model The managed object model.
+ @param managedObjectModel The managed object model.
  @param error If an error occurs, upon return contains an NSError object that describes the problem.
  */
 - (nullable instancetype)initWithCacheName:(NSString *)cacheName model:(NSManagedObjectModel *)managedObjectModel error:(NSError * __nullable * __nullable)error;
@@ -67,7 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Initializes a managed store that will persist its data in memory.
  
- @param model The managed object model.
+ @param managedObjectModel The managed object model.
  @param error If an error occurs, upon return contains an NSError object that describes the problem.
  */
 - (nullable instancetype)initWithModel:(NSManagedObjectModel *)managedObjectModel error:(NSError * __nullable * __nullable)error;
