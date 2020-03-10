@@ -147,7 +147,7 @@ public func objectsFromJSONArray<T: NSManagedObject>(_ array: JSONArray, inConte
  :return: A JSON dictionary.
  */
 public func JSONDictionaryFromObject(_ object: NSManagedObject) -> JSONDictionary {
-    return ((GRTJSONSerialization.jsonDictionary(from: object) as? NSDictionary) as? JSONDictionary) ?? JSONDictionary()
+    return (GRTJSONSerialization.jsonDictionary(from: object) as? JSONDictionary) ?? JSONDictionary()
 }
 
 /**
@@ -158,5 +158,5 @@ public func JSONDictionaryFromObject(_ object: NSManagedObject) -> JSONDictionar
  :return: A JSON array.
  */
 public func JSONArrayFromObjects(_ objects: [NSManagedObject]) -> JSONArray {
-    return (GRTJSONSerialization.jsonArray(from: objects) as? NSArray) as? JSONArray ?? JSONArray()
+    return GRTJSONSerialization.jsonArray(from: objects) as JSONArray
 }

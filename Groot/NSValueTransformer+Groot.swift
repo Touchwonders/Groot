@@ -67,7 +67,7 @@ extension ValueTransformer {
     */
     public class func setDictionaryTransformerWithName(_ name: String, transform: @escaping ([String: AnyObject]) -> ([String: AnyObject]?)) {
         grt_setDictionaryTransformer(withName: name) { value in
-            if let dictionary = (value as? NSDictionary) as? [String: AnyObject] {
+            if let dictionary = value as? [String: AnyObject] {
                 return transform(dictionary)
             }
             return nil
@@ -87,7 +87,7 @@ extension ValueTransformer {
     */
     public class func setEntityMapperWithName(_ name: String, map: @escaping ([String: AnyObject]) -> (String?)) {
         grt_setEntityMapper(withName: name) { value in
-            if let dictionary = (value as? NSDictionary) as? [String: AnyObject] {
+            if let dictionary = value as? [String: AnyObject] {
                 return map(dictionary)
             }
             return nil
